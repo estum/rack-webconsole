@@ -317,7 +317,7 @@ if (typeof module == "object" && typeof window == "undefined") {
   });
 
   $(document).ready(function() {
-    $(this).keypress(function(event) {
+    $(document).on('keydown', function(event) {
       if ($KEY_CODE.indexOf(event.which) >= 0) {
         $("#rack-webconsole").slideToggle('fast', function() {
           if ($(this).is(':visible')) {
