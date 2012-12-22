@@ -317,8 +317,8 @@ if (typeof module == "object" && typeof window == "undefined") {
   });
 
   $(document).ready(function() {
-    $('body').off('keydown.webconsole');
-    $('body').on('keydown.webconsole', function(event) {
+    $(document).off('keydown.webconsole');
+    $(document).on('keydown.webconsole', function(event) {
       if ($KEY_CODE.indexOf(event.which) >= 0) {
         $("#rack-webconsole").slideToggle('fast', function() {
           if ($(this).is(':visible')) {
