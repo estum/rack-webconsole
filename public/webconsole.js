@@ -1,5 +1,5 @@
 (function($) {
-  
+
 /* AnsiParse */
 ansiparse = function (str) {
   //
@@ -189,15 +189,15 @@ if (typeof module == "object" && typeof window == "undefined") {
 
 /* app */
   var webconsole = {
-    history:[],
+    history:retrieveHistroy(),
     pointer:0,
     query:$('#webconsole_query')
   }
-  
+
   $('#rack-webconsole form').submit(function(e){
     e.preventDefault();
   });
-	
+
 	// colors
 	var colors = {
 		'black': "#eeeeee",
@@ -219,7 +219,26 @@ if (typeof module == "object" && typeof window == "undefined") {
 		'cyan': "#dfdffe",
 		'white': "#ffffff"
 	}
-	
+
+  function retrieveHistroy()
+  {
+    var local_histroy = localStorage["webconsole"];
+    if(local_histroy) {
+      local_histroy = $.parseJSON(local_histroy);
+
+    } else {
+      local_histroy = [];
+    }
+    return local_histroy;
+  }
+
+  function updateHistroy(str)
+  {
+    local_histroy = retrieveHistroy();
+    local_histroy.push(str);
+    localStorage["webconsole"] = JSON.stringify(local_histroy);
+  }
+
 	function subColor(color, elem)
 	{
 		if (color == undefined) color = 'white';
@@ -263,6 +282,7 @@ if (typeof module == "object" && typeof window == "undefined") {
 
     // enter
     if (event.which == 13) {
+      updateHistroy(webconsole.query.val());
       webconsole.history.push(webconsole.query.val());
       webconsole.pointer = webconsole.history.length - 1;
       $.ajax({
@@ -287,7 +307,7 @@ if (typeof module == "object" && typeof window == "undefined") {
       });
 	    webconsole.query.val('');
     }
-    
+
     // up
     if (event.which == 38) {
       if (webconsole.pointer < 0) {
@@ -300,7 +320,7 @@ if (typeof module == "object" && typeof window == "undefined") {
         webconsole.pointer--;
       }
     }
-    
+
     // down
     if (event.which == 40) {
       if (webconsole.pointer == webconsole.history.length) {
@@ -313,11 +333,12 @@ if (typeof module == "object" && typeof window == "undefined") {
         webconsole.pointer++;
       }
     }
-    
+
   });
 
   $(document).ready(function() {
-    $(this).keypress(function(event) {
+    $(document).off('keydown.webconsole');
+    $(document).on('keydown.webconsole', function(event) {
       if ($KEY_CODE.indexOf(event.which) >= 0) {
         $("#rack-webconsole").slideToggle('fast', function() {
           if ($(this).is(':visible')) {
