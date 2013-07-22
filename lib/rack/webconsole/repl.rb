@@ -89,7 +89,7 @@ module Rack
           Pry.initial_session_setup
         end
         pry = $pry
-        
+
         # repl loop
         if pry.binding_stack.last
           target = Pry.binding_for(pry.binding_stack.last)
@@ -97,9 +97,9 @@ module Rack
           target = Pry.binding_for(TOPLEVEL_BINDING)
         end
         pry.repl_prologue(target) unless pry.binding_stack.last == target
-        pry.inject_sticky_locals(target)
+        pry.inject_sticky_locals!#(target)
         code = params['query']
-        hash[:prompt] = pry.select_prompt("", target) + Pry::Code.new(code).to_s
+        hash[:prompt] = pry.select_prompt + Pry::Code.new(code).to_s
         got_output = false
         begin
           read_pipe, write_pipe = IO.pipe
@@ -117,7 +117,7 @@ module Rack
           old_stderr = STDERR.dup
           STDOUT.reopen(write_pipe)
           STDERR.reopen(write_pipe)
-          if !pry.process_command(code, "", target)
+          if !pry.process_command(code)#, "", target)
             result = target.eval(code, Pry.eval_path, Pry.current_line)
             got_output = true
           end
@@ -135,7 +135,7 @@ module Rack
         end
 
         if got_output
-          pry.set_last_result(result, target, code)
+          pry.set_last_result(result, code)
           Pry.print.call($pry_output, result) if pry.should_print?
           # the below line doesn't work well with custom printers
           # (like awesome_print) for some reason
@@ -146,7 +146,7 @@ module Rack
 
         # cleanup (supposed to call when $pry is destroyed)
         # pry.repl_epilogue(target)
-        
+
         hash[:result] = $pry_output.string
         response_body = MultiJson.encode(hash)
         headers = {}
