@@ -189,7 +189,7 @@ if (typeof module == "object" && typeof window == "undefined") {
 
 /* app */
   var webconsole = {
-    history:retrieveHistroy(),
+    history:retrieveHistroy().reverse(),
     pointer:0,
     query:$('#webconsole_query')
   }
